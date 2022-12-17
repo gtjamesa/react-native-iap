@@ -61,11 +61,13 @@ export type STOREKIT_OPTIONS =
   | 'STOREKIT_HYBRID_MODE'
   | 'STOREKIT2_MODE';
 
+export type IapConfig = {
+  storekitMode?: STOREKIT_OPTIONS;
+}
+
 export const setup = ({
   storekitMode = 'STOREKIT1_MODE',
-}: {
-  storekitMode?: STOREKIT_OPTIONS;
-} = {}) => {
+}: IapConfig = {}) => {
   switch (storekitMode) {
     case 'STOREKIT1_MODE':
       storekit1Mode();
@@ -99,8 +101,15 @@ const App = () => {
 };
 ```
  */
-export const initConnection = (): Promise<boolean> =>
-  getNativeModule().initConnection();
+export const initConnection = (
+    config?: IapConfig,
+): Promise<boolean> => {
+  if (config) {
+    setup(config);
+  }
+
+  return getNativeModule().initConnection();
+}
 
 /**
  * Disconnects from native SDK
@@ -335,7 +344,7 @@ Note that this is only for backaward compatiblity. It won't publish to transacti
 @param {automaticallyFinishRestoredTransactions}:boolean. (IOS Sk1 only) When `true`, all the transactions that are returned are automatically
 finished. This means that if you call this method again you won't get the same result on the same device. On the other hand, if `false` you'd
 have to manually finish the returned transaction once you have delivered the content to your user.
-@param {onlyIncludeActiveItems}:boolean. (IOS Sk2 only). Defaults to false, meaning that it will return one transaction per item purchased. 
+@param {onlyIncludeActiveItems}:boolean. (IOS Sk2 only). Defaults to false, meaning that it will return one transaction per item purchased.
 @See https://developer.apple.com/documentation/storekit/transaction/3851204-currententitlements for details
  */
 export const getPurchaseHistory = ({
@@ -461,7 +470,7 @@ const App = () => {
 ```
 @param {alsoPublishToEventListener}:boolean When `true`, every element will also be pushed to the purchaseUpdated listener.
 Note that this is only for backaward compatiblity. It won't publish to transactionUpdated (Storekit2) Defaults to `false`
-@param {onlyIncludeActiveItems}:boolean. (IOS Sk2 only). Defaults to true, meaning that it will return the transaction if suscription has not expired. 
+@param {onlyIncludeActiveItems}:boolean. (IOS Sk2 only). Defaults to true, meaning that it will return the transaction if suscription has not expired.
 @See https://developer.apple.com/documentation/storekit/transaction/3851204-currententitlements for details
  *
  */

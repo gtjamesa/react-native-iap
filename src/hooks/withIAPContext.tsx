@@ -6,7 +6,7 @@ import {
   purchaseUpdatedListener,
   transactionListener,
 } from '../eventEmitter';
-import {IapIos, initConnection} from '../iap';
+import {IapIos, initConnection, IapConfig} from '../iap';
 import type {PurchaseError} from '../purchaseError';
 import type {
   Product,
@@ -51,7 +51,7 @@ export function useIAPContext(): IAPContextType {
   return ctx;
 }
 
-export function withIAPContext<T>(Component: React.ComponentType<T>) {
+export function withIAPContext<T>(Component: React.ComponentType<T>, config?: IapConfig) {
   return function WrapperComponent(props: T) {
     const [connected, setConnected] = useState(false);
     const [products, setProducts] = useState<Product[]>([]);
@@ -114,7 +114,7 @@ export function withIAPContext<T>(Component: React.ComponentType<T>) {
     );
 
     useEffect(() => {
-      initConnection()
+      initConnection(config)
         .then((value) => {
           setInitConnectionError(undefined);
           setConnected(value);
